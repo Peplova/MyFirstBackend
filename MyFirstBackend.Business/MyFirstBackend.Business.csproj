@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyFirstBackend.Core\MyFirstBackend.Core.csproj" />
+    <ProjectReference Include="..\MyFirstBackend.DataLayer\MyFirstBackend.DataLayer.csproj" />
+  </ItemGroup>
+
+</Project>
