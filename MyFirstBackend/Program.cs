@@ -2,32 +2,50 @@ using MyFirstBackend.Business;
 using MyFirstBackend.DataLayer;
 using MyFirstBackend.Extentions;
 using MyFirstBackend.Middlewares;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.ConfigureApiServices();
-builder.Services.ConfigureBllServices();
-builder.Services.ConfigureDataBase(builder.Configuration);
-builder.Services.ConfigureDalServices();
-
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using Serilog;
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+    Log.Logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .CreateLogger();
+    
+
+    // Add services to the container.
+
+    builder.Services.ConfigureApiServices();
+    builder.Services.ConfigureBllServices();
+    builder.Services.ConfigureDataBase(builder.Configuration);
+    builder.Services.ConfigureDalServices();
+    builder.Host.UseSerilog();             ;
+
+    var app = builder.Build();
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseSerilogRequestLogging();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+   
+    Log.Information("Running app");
+    app.Run();
+
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+catch (Exception ex)
+{
+    Log.Fatal(ex.Message);
+}
+finally
+{
+    Log.Information("App stopped.");
+    Log.CloseAndFlush();
+}   
