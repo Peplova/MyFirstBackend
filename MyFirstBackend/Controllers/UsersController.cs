@@ -91,6 +91,11 @@ public class UsersController : Controller
         
         return NoContent();
     }
-   
 
+    [HttpPatch("/devices")]
+    public ActionResult <UserWithDevicesResponse>ExchangeDevices(UserWithDevicesResponse user1, UserWithDevicesResponse user2)
+    {
+        _usersServices.ExchangeDevices(user1.Devices, user2.Devices);
+        return Ok (new UserWithDevicesResponse());
+    }
 }

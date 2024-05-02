@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Serilog;
 using System.Data;
+using MyFirstBackend.Models.Responses;
 
 namespace MyFirstBackend.Business.Services;
 
@@ -49,7 +50,7 @@ public class UsersServices : IUsersServices
         }
        // _usersRepository.DeleteUserById();
     }
-    public static void ExchangeDevices(User user1, User user2)
+    public void ExchangeDevices(UserWithDevicesResponse user1, UserWithDevicesResponse user2)
     {
         var tempDevices = user1.Devices;
         user1.Devices = user2.Devices;
