@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyFirstBackend.Business.Services;
 using MyFirstBackend.Core.Dtos;
 using MyFirstBackend.DataLayer.Repositories;
 namespace MyFirstBackend.Controllers;
+[Authorize]
 [ApiController]
 [Route("/api/devices")]
 

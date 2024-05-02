@@ -6,6 +6,7 @@ using Serilog;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    builder.Logging.ClearProviders();
     Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(builder.Configuration)
         .CreateLogger();
@@ -13,9 +14,8 @@ try
 
     // Add services to the container.
 
-    builder.Services.ConfigureApiServices();
+    builder.Services.ConfigureApiServices(builder.Configuration);
     builder.Services.ConfigureBllServices();
-    builder.Services.ConfigureDataBase(builder.Configuration);
     builder.Services.ConfigureDalServices();
     builder.Host.UseSerilog();             ;
 
@@ -23,7 +23,7 @@ try
     app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
+    if (!app.Environment.IsProduction())
     {
         app.UseSwagger();
         app.UseSwaggerUI();
@@ -31,7 +31,7 @@ try
 
     app.UseHttpsRedirection();
     app.UseSerilogRequestLogging();
-
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
