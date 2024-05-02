@@ -15,6 +15,8 @@ public class UsersServices : IUsersServices
 {
     private readonly IUsersRepository _usersRepository;
     private readonly Serilog.ILogger _logger = Log.ForContext<UsersServices>();
+    private readonly string _pepper;
+    private readonly int _iteration = 7;
     public UsersServices(IUsersRepository usersRepository)
     {
         _usersRepository = usersRepository;
@@ -33,6 +35,7 @@ public class UsersServices : IUsersServices
     }
     public List<UserDto> GetUsers()
     {
+        _logger.Information("");
         return _usersRepository.GetUsers();
     }
     public UserDto GetUserById(Guid Id)
