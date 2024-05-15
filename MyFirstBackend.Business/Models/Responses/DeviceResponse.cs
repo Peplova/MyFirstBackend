@@ -1,6 +1,6 @@
 ﻿using MyFirstBackend.Core.Enums;
 
-namespace MyFirstBackend.Models.Responses;
+namespace MyFirstBackend.Business.Models.Responses;
 
 public class DeviceResponse
 {

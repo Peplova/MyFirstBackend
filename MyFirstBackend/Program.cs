@@ -1,4 +1,8 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using MyFirstBackend.Business;
+using MyFirstBackend.Business.Automapping;
+using MyFirstBackend.Business.Validation;
 using MyFirstBackend.DataLayer;
 using MyFirstBackend.Extentions;
 using MyFirstBackend.Middlewares;
@@ -17,6 +21,10 @@ try
     builder.Services.ConfigureApiServices(builder.Configuration);
     builder.Services.ConfigureBllServices();
     builder.Services.ConfigureDalServices();
+    builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+    builder.Services.AddFluentValidationAutoValidation()
+               .AddFluentValidationClientsideAdapters()
+               .AddValidatorsFromAssemblyContaining<UserCreateRequestValidation>();
     builder.Host.UseSerilog();             ;
 
     var app = builder.Build();

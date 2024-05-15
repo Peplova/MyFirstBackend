@@ -1,6 +1,6 @@
-﻿namespace MyFirstBackend.Models.Requests;
+﻿namespace MyFirstBackend.Business.Models.Requests;
 
-public class LoginUserRequests
+public class LoginUserRequest
 { 
     public string UserName { get; set; }
     public string Password { get; set; }

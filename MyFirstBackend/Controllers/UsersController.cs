@@ -1,8 +1,11 @@
 ﻿
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MyFirstBackend.Business.Models.Requests;
 using MyFirstBackend.Business.Services;
+using MyFirstBackend.Business.Validation;
 using MyFirstBackend.Core.Dtos;
 using MyFirstBackend.DataLayer.Migrations;
 using MyFirstBackend.Middlewares;
@@ -21,10 +24,12 @@ namespace MyFirstBackend.Controllers;
 
 public class UsersController : Controller
 {
-    private readonly IUsersServices _usersServices;
-    private readonly IDevicesServices _devicesServices;
+    private readonly IUsersService _usersServices;
+    private readonly IDevicesService _devicesServices;
+    private readonly IValidationContext _validationContext;
     private readonly Serilog.ILogger _logger = Log.ForContext<UsersController>();
-    public UsersController(IUsersServices usersService)
+    
+    public UsersController(IUsersService usersService)
     {
         _usersServices = usersService;
     }
@@ -46,39 +51,52 @@ public class UsersController : Controller
     [HttpPost]
     public ActionResult <Guid> CreateUser([FromBody] CreateUserRequest request)
     {
-        _logger.Information($"{request.UserName} {request.Password}");
-       var id = _usersServices.AddUser(new()
+        var validator = new UserCreateRequestValidation();
+        var result = validator.Validate(request);
+        if (!result.IsValid)
         {
-            Password = request.Password,
+            return BadRequest(result.Errors);
+        }
+
+        _logger.Information($"{request.UserName} {request.Password}");
+        var salt = BCrypt.Net.BCrypt.GenerateSalt();
+        var pepper = "your_pepper_here";
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password + pepper, salt, 12);
+        var id = _usersServices.AddUser(new()
+        {
+            Password = hashedPassword,
             UserName = request.UserName,
             Age = request.Age,
             Email = request.Email,
         });
         return Ok(id);
     }
+
     [HttpPost("login")]
-    public ActionResult<AuthenticatedResponse> Login([FromBody] LoginUserRequests user)
+    public ActionResult<AuthenticatedResponse> Login([FromBody] LoginUserRequest user)
     {
-        if (user is null)
+        var validator = new LoginUserRequestsValidator();
+        var validationResult = validator.Validate(user);
+
+        if (!validationResult.IsValid)
         {
-            return BadRequest("Invalid client request");
+            return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
         }
-        if (user.UserName == "johndoe" && user.Password == "def@123")
-        {
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("myFirstbackend_superSecretKey@345"));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var tokenOptions = new JwtSecurityToken(
-                issuer: "MyFirstBackend",
-                audience: "UI",
-                claims: new List<Claim>(),
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: signinCredentials
-            );
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            return Ok(new AuthenticatedResponse { Token = tokenString });
-        }
-        return Unauthorized();
+        
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mySecretcodding_superSecretKey@345"));
+        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+        var tokenOptions = new JwtSecurityToken(
+            issuer: "MyFirstBackend",
+            audience: "UI",
+            claims: new List<Claim>(),
+            expires: DateTime.Now.AddDays(1),
+            signingCredentials: signinCredentials
+        );
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+        return Ok(new AuthenticatedResponse { Token = tokenString });
     }
+
     [HttpPut("{id}")]
     public Guid UpdateUser([FromRoute] Guid id, [FromBody]object request)
     {
@@ -92,10 +110,10 @@ public class UsersController : Controller
         return NoContent();
     }
 
-    [HttpPatch("/devices")]
-    public ActionResult <UserWithDevicesResponse>ExchangeDevices(UserWithDevicesResponse user1, UserWithDevicesResponse user2)
+    [HttpPatch("/exchange-devices")]
+    public ActionResult ExchangeDevices([FromBody] ExchangeDevicesRequest request)
     {
-        _usersServices.ExchangeDevices(user1.Devices, user2.Devices);
-        return Ok (new UserWithDevicesResponse());
+        _usersServices.ExchangeDevices(request);
+        return NoContent();
     }
 }

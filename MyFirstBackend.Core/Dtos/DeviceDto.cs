@@ -1,7 +1,7 @@
 ﻿using MyFirstBackend.Core.Enums;
 
 namespace MyFirstBackend.Core.Dtos;
-public class DeviceDto: IdConteiner
+public class DeviceDto: IdContainer
 {
     public string Name { get; set; }
     public DeviceType DeviceType { get; set; }

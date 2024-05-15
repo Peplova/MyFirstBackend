@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MyFirstBackend.Core.Dtos;
-public class UserDto: IdConteiner
+public class UserDto: IdContainer
 { 
     public string UserName { get; set; }
     public string Password { get; set; }

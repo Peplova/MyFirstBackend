@@ -1,4 +1,4 @@
-﻿namespace MyFirstBackend.Models.Requests;
+﻿namespace MyFirstBackend.Business.Models.Requests;
 
 public class CreateUserRequest
 {

@@ -10,8 +10,8 @@ namespace MyFirstBackend.Controllers;
 
 public class DevicesController : Controller
 {
-    private readonly IDevicesServices _devicesServices;
-    public DevicesController(IDevicesServices deviceServices)
+    private readonly IDevicesService _devicesServices;
+    public DevicesController(IDevicesService deviceServices)
     {
         _devicesServices = deviceServices;
     }

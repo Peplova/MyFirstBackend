@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyFirstBackend.Core.Dtos;
 
-public class IdConteiner
+public class IdContainer
 {
     public Guid Id { get; set; }
 }

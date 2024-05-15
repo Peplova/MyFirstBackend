@@ -5,10 +5,10 @@ using MyFirstBackend.DataLayer.Repositories;
 
 namespace MyFirstBackend.Business.Services;
 
-public class DevicesServices : IDevicesServices
+public class DevicesService : IDevicesService
 {
     private readonly IDevicesRepository _devicesRepository;
-    public DevicesServices(IDevicesRepository devicesRepository)
+    public DevicesService(IDevicesRepository devicesRepository)
     {
         _devicesRepository = devicesRepository;
     }

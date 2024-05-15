@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation.AspNetCore;
+using Microsoft.Extensions.DependencyInjection;
+using MyFirstBackend.Business.Automapping;
 using MyFirstBackend.Business.Services;
+using MyFirstBackend.Business.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +15,10 @@ public static class ConfigureServices
 {
     public static void ConfigureBllServices(this IServiceCollection services)
     {
-        services.AddScoped<IUsersServices, UsersServices>();
-        services.AddScoped<IDevicesServices, DevicesServices>();
+        services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<IDevicesService, DevicesService>();
+        services.AddControllers()
+           .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginUserRequestsValidator>());
 
     }
 }

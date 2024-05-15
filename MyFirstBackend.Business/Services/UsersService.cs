@@ -8,16 +8,18 @@ using System.Threading.Tasks;
 using Serilog;
 using System.Data;
 using MyFirstBackend.Models.Responses;
+using MyFirstBackend.Models.Requests;
+using MyFirstBackend.Business.Models.Requests;
 
 namespace MyFirstBackend.Business.Services;
 
-public class UsersServices : IUsersServices
+public class UsersService : IUsersService
 {
     private readonly IUsersRepository _usersRepository;
-    private readonly Serilog.ILogger _logger = Log.ForContext<UsersServices>();
+    private readonly Serilog.ILogger _logger = Log.ForContext<UsersService>();
     private readonly string _pepper;
     private readonly int _iteration = 7;
-    public UsersServices(IUsersRepository usersRepository)
+    public UsersService(IUsersRepository usersRepository)
     {
         _usersRepository = usersRepository;
     }
@@ -53,11 +55,11 @@ public class UsersServices : IUsersServices
         }
        // _usersRepository.DeleteUserById();
     }
-    public void ExchangeDevices(UserWithDevicesResponse user1, UserWithDevicesResponse user2)
+        public void ExchangeDevices(ExchangeDevicesRequest request)
     {
-        var tempDevices = user1.Devices;
-        user1.Devices = user2.Devices;
-        user2.Devices = tempDevices;
+        //var tempDevices = user1.Devices;
+        //user1.Devices = user2.Devices;
+        //user2.Devices = tempDevices;
     }
 }
 
