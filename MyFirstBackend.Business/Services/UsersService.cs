@@ -1,15 +1,9 @@
-﻿using MyFirstBackend.Core.Dtos;
-using MyFirstBackend.DataLayer.Repositories;
-using MyFirstBackend.Core.Exeptions;
-using MyFirstBackend.Core;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Serilog;
-using System.Data;
-using MyFirstBackend.Models.Responses;
-using MyFirstBackend.Models.Requests;
+﻿using Microsoft.EntityFrameworkCore;
 using MyFirstBackend.Business.Models.Requests;
+using MyFirstBackend.Core.Dtos;
+using MyFirstBackend.Core.Exeptions;
+using MyFirstBackend.DataLayer.Repositories;
+using Serilog;
 
 namespace MyFirstBackend.Business.Services;
 
@@ -18,18 +12,18 @@ public class UsersService : IUsersService
     private readonly IUsersRepository _usersRepository;
     private readonly Serilog.ILogger _logger = Log.ForContext<UsersService>();
     private readonly string _pepper;
-    private readonly int _iteration = 7;
+    private readonly int _iteration = 13;
     public UsersService(IUsersRepository usersRepository)
     {
         _usersRepository = usersRepository;
     }
     public Guid AddUser(UserDto user)
-    { 
-        if (user.Age <18 || user.Age > 100) 
+    {
+        if (user.Age < 18 || user.Age > 99)
         {
             throw new ValidationException("Возраст указан неверно");
         }
-        if (string.IsNullOrEmpty (user.Password)|| user.Password.Length < 8) 
+        if (string.IsNullOrEmpty(user.Password) || user.Password.Length < 6)
         {
             throw new ValidationException("Неверный пароль");
         }
@@ -46,21 +40,53 @@ public class UsersService : IUsersService
         return _usersRepository.GetUserById(Id);
 
     }
-    public void DeleteUserById(Guid Id) 
+    public void DeleteUserById(Guid Id)
     {
         var user = _usersRepository.GetUserById(Id);
-        if (user is null) 
+        if (user is null)
         {
             throw new NotFoundExeption($"Юзер с {Id} не найден");
         }
-       // _usersRepository.DeleteUserById();
+        // _usersRepository.DeleteUserById();
     }
-        public void ExchangeDevices(ExchangeDevicesRequest request)
+    public async void ExchangeDevices(ExchangeDevicesRequest request)
     {
         //var tempDevices = user1.Devices;
         //user1.Devices = user2.Devices;
         //user2.Devices = tempDevices;
+        var userFrom = _usersRepository.GetUserById(request.UserIdFrom);
+        if (userFrom == null || !userFrom.Devices.Any(d => request.Devices.Contains(d.Id)))
+            throw new Exception("Пользователь для обмена не найден или у него нет нужных устройств.");
+
+        // Найти пользователя, с которым будут меняться (to)
+        var userTo = _usersRepository.GetUserById(request.UserIdTo);
+        if (userTo == null) {
+            throw new Exception("Пользователь для обмена не найден.");
+        }
+
+        // Проверить, есть ли у пользователя from устройства с нужными id
+        var devicesToExchange = userFrom.Devices.Where(d => request.Devices.Contains(d.Id)).ToList();
+        if (!devicesToExchange.Any())
+            throw new Exception("У пользователя нет устройств для обмена.");
+
+        // Удалить устройства у пользователя from
+        foreach (var device in devicesToExchange)
+        {
+            userFrom.Devices.Remove(device);
+        }
+
+        // Добавить устройства пользователю to
+        foreach (var device in devicesToExchange)
+        {
+            userTo.Devices.Add(device);
+        }
+
+         context.SaveChanges();
+
+
+
     }
 }
+
 
 

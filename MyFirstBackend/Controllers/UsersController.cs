@@ -4,15 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyFirstBackend.Business.Models.Requests;
+using MyFirstBackend.Business.Models.Responses;
 using MyFirstBackend.Business.Services;
 using MyFirstBackend.Business.Validation;
-using MyFirstBackend.Core.Dtos;
-using MyFirstBackend.DataLayer.Migrations;
-using MyFirstBackend.Middlewares;
-using MyFirstBackend.Models.Requests;
-using MyFirstBackend.Models.Responses;
 using Serilog;
-using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -28,7 +23,7 @@ public class UsersController : Controller
     private readonly IDevicesService _devicesServices;
     private readonly IValidationContext _validationContext;
     private readonly Serilog.ILogger _logger = Log.ForContext<UsersController>();
-    
+
     public UsersController(IUsersService usersService)
     {
         _usersServices = usersService;
@@ -49,7 +44,7 @@ public class UsersController : Controller
         return Ok(new UserWithDevicesResponse());
     }
     [HttpPost]
-    public ActionResult <Guid> CreateUser([FromBody] CreateUserRequest request)
+    public ActionResult<Guid> CreateUser([FromBody] CreateUserRequest request)
     {
         var validator = new UserCreateRequestValidation();
         var result = validator.Validate(request);
@@ -61,7 +56,7 @@ public class UsersController : Controller
         _logger.Information($"{request.UserName} {request.Password}");
         var salt = BCrypt.Net.BCrypt.GenerateSalt();
         var pepper = "your_pepper_here";
-        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password + pepper, salt, 12);
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password, workFactor: 13);
         var id = _usersServices.AddUser(new()
         {
             Password = hashedPassword,
@@ -82,7 +77,7 @@ public class UsersController : Controller
         {
             return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
         }
-        
+
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mySecretcodding_superSecretKey@345"));
         var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
         var tokenOptions = new JwtSecurityToken(
@@ -98,15 +93,15 @@ public class UsersController : Controller
     }
 
     [HttpPut("{id}")]
-    public Guid UpdateUser([FromRoute] Guid id, [FromBody]object request)
+    public Guid UpdateUser([FromRoute] Guid id, [FromBody] object request)
     {
         return Guid.NewGuid();
     }
     [HttpDelete("{id}")]
     public ActionResult DeleteUserById(Guid id)
     {
-            _usersServices.DeleteUserById(id);
-        
+        _usersServices.DeleteUserById(id);
+
         return NoContent();
     }
 

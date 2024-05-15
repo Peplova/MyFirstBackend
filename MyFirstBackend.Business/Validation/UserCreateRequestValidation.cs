@@ -1,14 +1,9 @@
 ﻿using FluentValidation;
-using MyFirstBackend.Models.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MyFirstBackend.Business.Models.Requests;
 
 namespace MyFirstBackend.Business.Validation;
 
-public class UserCreateRequestValidation: AbstractValidator<CreateUserRequest>
+public class UserCreateRequestValidation : AbstractValidator<CreateUserRequest>
 {
     public UserCreateRequestValidation()
     {
