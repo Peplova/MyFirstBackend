@@ -1,4 +1,5 @@
 ﻿
+using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ public class UsersController : Controller
     private readonly IDevicesService _devicesServices;
     private readonly IValidationContext _validationContext;
     private readonly Serilog.ILogger _logger = Log.ForContext<UsersController>();
+    private readonly IMapper _mapper;
 
     public UsersController(IUsersService usersService)
     {

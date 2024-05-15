@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyFirstBackend.Business.Models.Requests;
 using MyFirstBackend.Core.Dtos;
 using MyFirstBackend.Core.Exeptions;
@@ -13,11 +14,15 @@ public class UsersService : IUsersService
     private readonly Serilog.ILogger _logger = Log.ForContext<UsersService>();
     private readonly string _pepper;
     private readonly int _iteration = 13;
-    public UsersService(IUsersRepository usersRepository)
+    private readonly IMapper _mapper;
+    private readonly DbContext _dbContext;
+    public UsersService(IUsersRepository usersRepository, IMapper mapper)
     {
         _usersRepository = usersRepository;
+        _mapper = mapper;
     }
-    public Guid AddUser(UserDto user)
+ 
+public Guid AddUser(UserDto user)
     {
         if (user.Age < 18 || user.Age > 99)
         {
@@ -42,12 +47,12 @@ public class UsersService : IUsersService
     }
     public void DeleteUserById(Guid Id)
     {
-        var user = _usersRepository.GetUserById(Id);
+        var user = _usersRepository.GetUserById (Id);
         if (user is null)
         {
             throw new NotFoundExeption($"Юзер с {Id} не найден");
         }
-        // _usersRepository.DeleteUserById();
+       _usersRepository.DeleteUserById(Id);
     }
     public async void ExchangeDevices(ExchangeDevicesRequest request)
     {
@@ -81,7 +86,7 @@ public class UsersService : IUsersService
             userTo.Devices.Add(device);
         }
 
-         context.SaveChanges();
+         _dbContext.SaveChanges();
 
 
 

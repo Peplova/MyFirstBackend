@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyFirstBackend.Business.Services;
 using MyFirstBackend.Core.Dtos;
@@ -11,6 +12,7 @@ namespace MyFirstBackend.Controllers;
 public class DevicesController : Controller
 {
     private readonly IDevicesService _devicesServices;
+    private readonly IMapper _mapper;
     public DevicesController(IDevicesService deviceServices)
     {
         _devicesServices = deviceServices;

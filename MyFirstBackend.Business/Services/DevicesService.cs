@@ -1,5 +1,6 @@
 ﻿
 
+using AutoMapper;
 using MyFirstBackend.Core.Dtos;
 using MyFirstBackend.DataLayer.Repositories;
 
@@ -8,6 +9,7 @@ namespace MyFirstBackend.Business.Services;
 public class DevicesService : IDevicesService
 {
     private readonly IDevicesRepository _devicesRepository;
+    private readonly IMapper _mapper;
     public DevicesService(IDevicesRepository devicesRepository)
     {
         _devicesRepository = devicesRepository;

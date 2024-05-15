@@ -27,4 +27,9 @@ public class UsersRepository : BaseRepository, IUsersRepository
 
 
     }
+    public UserDto DeleteUserById (Guid Id)
+    {
+        _logger.Information($"Deleted {Id}");
+        return _ctx.Users.FirstOrDefault( x => x.Id == Id);
+    }
 }
