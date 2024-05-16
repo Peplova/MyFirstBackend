@@ -31,12 +31,12 @@ public Guid AddUser(UserDto user)
         {
             throw new ValidationException("Неверный пароль");
         }
-        return Guid.NewGuid();
+        return _usersRepository.AddUser(user);
     }
     public List<UserDto> GetUsers()
     {
         _logger.Information("");
-        return _usersRepository.GetUsers();
+        return (_usersRepository.GetUsers()).Select(t => t).ToList();
     }
     public UserDto GetUserById(Guid Id)
     {
@@ -59,30 +59,26 @@ public Guid AddUser(UserDto user)
         //user1.Devices = user2.Devices;
         //user2.Devices = tempDevices;
         var userFrom = _usersRepository.GetUserById(request.UserIdFrom);
-        if (userFrom == null || !userFrom.Devices.Any(d => request.Devices.Contains(d.Id)))
+        if (userFrom == null)
             throw new Exception("Пользователь для обмена не найден или у него нет нужных устройств.");
 
         // Найти пользователя, с которым будут меняться (to)
         var userTo = _usersRepository.GetUserById(request.UserIdTo);
-        if (userTo == null) {
+        if (userTo == null) 
+        {
             throw new Exception("Пользователь для обмена не найден.");
         }
 
         // Проверить, есть ли у пользователя from устройства с нужными id
         var devicesToExchange = userFrom.Devices.Where(d => request.Devices.Contains(d.Id)).ToList();
-        if (!devicesToExchange.Any())
+        if (devicesToExchange.Count!= request.Devices.Count)
             throw new Exception("У пользователя нет устройств для обмена.");
 
-        // Удалить устройства у пользователя from
+        // Удалить устройства у пользователя from, добвить устроиство пользователю to
         foreach (var device in devicesToExchange)
         {
-            userFrom.Devices.Remove(device);
-        }
-
-        // Добавить устройства пользователю to
-        foreach (var device in devicesToExchange)
-        {
-            userTo.Devices.Add(device);
+            _usersRepository.DeleteDeviceFromUser(userFrom.Id, device.Id);
+            _usersRepository.AddDeviceToUser(userTo.Id, device.Id);
         }
 
     }

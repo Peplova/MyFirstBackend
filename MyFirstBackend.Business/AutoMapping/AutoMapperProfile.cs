@@ -9,9 +9,9 @@ namespace MyFirstBackend.Business.Automapping
     {
         public AutoMapperProfile()
         {
-            CreateMap<UserDto, CreateUserRequest>();
-            CreateMap<UserDto, LoginUserRequest>();
-            CreateMap<UserDto, ExchangeDevicesRequest>();
+            CreateMap<CreateUserRequest, UserDto>();
+            CreateMap<LoginUserRequest, UserDto>();
+            CreateMap<ExchangeDevicesRequest, UserDto>();
             CreateMap<DeviceDto, DeviceResponse>();
             CreateMap<UserDto, UserResponse>();
         }

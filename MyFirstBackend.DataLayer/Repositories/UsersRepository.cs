@@ -16,6 +16,10 @@ public class UsersRepository : BaseRepository, IUsersRepository
     {
 
     }
+    public Guid AddUser(UserDto dto)
+    {
+        return Guid.NewGuid();
+    }
     public List<UserDto> GetUsers()
     {
         return _ctx.Users.ToList();
@@ -31,5 +35,19 @@ public class UsersRepository : BaseRepository, IUsersRepository
     {
         _logger.Information($"Deleted {Id}");
         return _ctx.Users.FirstOrDefault( x => x.Id == Id);
+    }
+    public void DeleteDeviceFromUser(Guid userId, Guid deviceId)
+    {
+        var user = _ctx.Users.FirstOrDefault(x => x.Id == userId);
+        var device = user.Devices.FirstOrDefault(x => x.Id == deviceId);
+        user.Devices.Remove(device);
+        _ctx.SaveChanges();
+    }
+    public void AddDeviceToUser (Guid userId, Guid deviceId)
+    {
+        var user = _ctx.Users.FirstOrDefault(x => x.Id == userId);
+        var device = user.Devices.FirstOrDefault(x => x.Id == deviceId);
+        user.Devices.Add(device);
+        _ctx.SaveChanges();
     }
 }
