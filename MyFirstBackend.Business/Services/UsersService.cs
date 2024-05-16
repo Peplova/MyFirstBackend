@@ -15,7 +15,6 @@ public class UsersService : IUsersService
     private readonly string _pepper;
     private readonly int _iteration = 13;
     private readonly IMapper _mapper;
-    private readonly DbContext _dbContext;
     public UsersService(IUsersRepository usersRepository, IMapper mapper)
     {
         _usersRepository = usersRepository;
@@ -85,10 +84,6 @@ public Guid AddUser(UserDto user)
         {
             userTo.Devices.Add(device);
         }
-
-         _dbContext.SaveChanges();
-
-
 
     }
 }
