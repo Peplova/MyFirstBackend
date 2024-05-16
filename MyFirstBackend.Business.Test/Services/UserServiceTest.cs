@@ -5,6 +5,7 @@ using MyFirstBackend.DataLayer.Repositories;
 using MyFirstBackend.Core.Exeptions;
 using AutoMapper;
 using MyFirstBackend.Business.Automapping;
+using MyFirstBackend.Business.Models.Requests;
 namespace MyFirstBackend.Business.Test.Services;
 
 
@@ -126,7 +127,26 @@ public class UserServiceTest
         _usersRepositoryMock.Verify(x => x.DeleteUserById(userId), Times.Never);
     }
     [Fact]
-    public void 
+    public void ExchangeDevices_WhenAllConditionsSent_ExchangesDevicesReserved()
+    {
+        //arrange
+        var userFromId = Guid.Empty;
+        var userToId = Guid.Empty;
+        _usersRepositoryMock.Setup(x => x.GetUserById(userFromId)).Returns(new UserDto());
+        _usersRepositoryMock.Setup(x => x.GetUserById(userToId)).Returns(new UserDto());
+        _usersRepositoryMock.Setup(x => x.DeleteDeviceFromUser(It.IsAny<UserDto>(), It.IsAny<DeviceDto>()));
+        _usersRepositoryMock.Setup(x => x.AddDeviceToUser(It.IsAny<UserDto>(), It.IsAny<DeviceDto>()));
+        var sut = new UsersService(_usersRepositoryMock.Object, _mapper);
+
+        //act
+        sut.ExchangeDevices();
+
+        //assert
+        _usersRepositoryMock.Verify(x => x.GetUserById(userId), Times.Once);
+        _usersRepositoryMock.Verify(x => x.DeleteUserById(userId), Times.Once);
+    }
+
+}
 
 
 }
